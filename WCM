@@ -1,0 +1,96 @@
+Advanced content with structures and templates
+
+If you’ve ever launched a web site, you know that as it grows, you can experience growing pains. This is the case especially if you’ve given lots of people access to the site to make whatever changes they need to make. Without preset limitations, users can display content in any order and in any manner they desire (think huge, flashing letters in a font nobody can read). Content can get stale, especially if those responsible for it don’t maintain it like they should. And sometimes, content is published that should never have seen the light of day.
+
+Thankfully, Liferay WCM helps you handle all of those situations. You can use Structures to define which fields are available to users when they create content. These can be coupled with Templates that define how to display that content. Content won’t get stale, because you can take advantage of the Scheduling feature to determine when content is displayed and when it’s removed. Additionally, you can configure Liferay’s built-in Workflow system to set up a review and publishing process so only what you want winds up on the live site. Liferay Portal gives you the management tools you need to run everything from a simple, one-page web site to an enormous, content-rich site.
+
+All of this starts with structures.
+
+Using structures
+
+Structures are the foundation for web content. They determine which fields are available to users as they create new items for display. Structures not only improve manageability for the administrator, they also make it much easier for users to quickly add content.
+
+For example, say you’re managing an online news magazine. All your articles need to contain the same types of information: a title, a subtitle, an author and one or more pages of text and images that comprise the body of the article. If Liferay only supported simple content as has been described above, you’d have no way to make sure your users entered a title, subtitle, and author. You might also get articles that don’t match the look and feel of your site. If titles are supposed to be navy blue but they come in from your writers manually set to light blue, you need to spend time reformatting them before they are published.
+
+Structures give you the ability to provide a format for your content so your users know what needs to be entered to have a complete article. Using structures, you can provide a form for your users which spells out exactly what is required and can be formatted automatically using a template.
+
+You create a structure by adding form controls such as text fields, text boxes, text areas (HTML), check boxes, select boxes and multi-selection lists. Also you can add specialized, Liferay-specific application fields such as Image Uploader and Documents and Media right onto the structure. Furthermore, you can move the elements around by dragging them where you want them. This makes it easy for you to prototype different orders for your input fields. Additionally, elements can be grouped together into blocks which can then be repeatable. Template writers can then write a template which loops through these blocks and presents your content in innovative ways, such as in sliding navigation bars, content which scrolls with the user and more.
+
+
+sample structure code
+
+<?xml version="1.0"?>
+
+<root>
+	<dynamic-element name="image" type="image" index-type="" repeatable="false">
+		<meta-data>
+			<entry name="displayAsTooltip"><![CDATA[false]]></entry>
+			<entry name="required"><![CDATA[false]]></entry>
+			<entry name="instructions"><![CDATA[]]></entry>
+			<entry name="label"><![CDATA[image]]></entry>
+			<entry name="predefinedValue"><![CDATA[]]></entry>
+		</meta-data>
+		<dynamic-element name="height" type="text" index-type="" repeatable="false">
+			<meta-data>
+				<entry name="displayAsTooltip"><![CDATA[false]]></entry>
+				<entry name="required"><![CDATA[false]]></entry>
+				<entry name="instructions"><![CDATA[]]></entry>
+				<entry name="label"><![CDATA[height]]></entry>
+				<entry name="predefinedValue"><![CDATA[]]></entry>
+			</meta-data>
+		</dynamic-element>
+		<dynamic-element name="width" type="text" index-type="" repeatable="false">
+			<meta-data>
+				<entry name="displayAsTooltip"><![CDATA[false]]></entry>
+				<entry name="required"><![CDATA[false]]></entry>
+				<entry name="instructions"><![CDATA[]]></entry>
+				<entry name="label"><![CDATA[width]]></entry>
+				<entry name="predefinedValue"><![CDATA[]]></entry>
+			</meta-data>
+		</dynamic-element>
+	</dynamic-element>
+	<dynamic-element name="content" type="text_area" index-type="" repeatable="false"/>
+</root>
+
+
+
+
+
+
+
+
+
+
+Using templates
+
+Developers create templates to display the elements of the structure in the markup they want. Content can then be styled properly using CSS, because markup is generated consistently by the template when structured content is displayed. In essence, templates are scripts that tell Liferay how to display content in the structure. Any changes to the structure require corresponding changes to the template, because new or deleted fields produce errors on the page. If users enter content into a structure, it must have a matching template. Without a template, the portal has no idea how to display content which has been created using a custom structure.
+
+Let’s look more closely at the types of templates Liferay supports.
+
+Template Types (VM, XSL, FTL and CSS)
+
+Liferay supports templates written in four different templating languages, to support the skill sets of the largest number of developers. This increases the chances you can jump right in and use whichever one you’ve already used before. If you haven’t yet been exposed to any of them, your best bet is Velocity or Freemarker, as they are less “chatty” than XSL and extremely simple to understand.
+
+VM (Velocity Macro): Velocity is a scripting language that lets you mix logic with HTML. This is similar to other scripting languages, such as PHP, though Velocity is much simpler. Because it’s been in the product the longest, it is probably the most widely used language for templates in Liferay WCM. If you haven’t used any of the template languages before, we recommend using Velocity: you’ll get up to speed the fastest.
+
+XSL (Extensible Style Sheet Language): XSL is used in Liferay templates to transform the underlying XML of a structure into markup suitable for the browser. While it may not be as clean and compact as Velocity or FTL, it’s widely used for transforming XML into other formats and it’s very likely your developers have already been exposed to it.
+
+FTL (FreeMarker Template Language): Freemarker is a templating language which could be considered a successor to Velocity, though it is not yet as popular. It has some advantages over Velocity for which it sacrifices some simplicity, yet it is still easy to use.
+
+CSS (Cascading Style Sheets): You can use CSS if your structure is very straightforward and modifications are simple (colors, fonts, layouts, etc.). If your structure is more complex, however, you’ll need to use one of the other options.
+
+Below is the template script for this structure. It is written in Velocity:
+
+#set ($renderUrlMax = $request.get("render-url-maximized"))
+#set ($namespace = $request.get("portlet-namespace"))
+#set($readmore = $request.get("parameters").get("read_more"))
+<h1>$title.getData()</h1>
+#if ($readmore)
+<p>$abstract.getData()</p>
+<p>$body.getData()</p>
+#else
+<p>
+<img src="${image.getData()}" border="0" align="right">
+$abstract.getData()</p>
+<a href="${renderUrlMax}&${namespace}read_more=true">Read More</a>
+#end
